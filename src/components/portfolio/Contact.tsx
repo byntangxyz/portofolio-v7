@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useGSAP } from "@gsap/react";
-import { useRef } from "react";
+import { useGSAP } from '@gsap/react';
+import { useRef } from 'react';
 
-import { gsap } from "@/lib/gsap";
+import { gsap } from '@/lib/gsap';
 
-const GITHUB_URL = "https://github.com/byntangxyz";
+const GITHUB_URL = 'https://github.com/byntangxyz';
 
 const LINK_CLASS =
-  "text-sm font-medium text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)]";
+  'text-sm font-medium text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)]';
 
 /**
  * Minimal footer for `#contact`, shared by `/` and `/about`.
@@ -28,28 +28,28 @@ export function Contact() {
     () => {
       const mm = gsap.matchMedia();
 
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.from("[data-contact-divider]", {
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        gsap.from('[data-contact-divider]', {
           scaleX: 0,
-          transformOrigin: "left center",
+          transformOrigin: 'left center',
           duration: 1,
-          ease: "power3.out",
+          ease: 'power3.out',
           scrollTrigger: {
             trigger: containerRef.current,
-            start: "top 92%",
+            start: 'top 92%',
             once: true,
           },
         });
 
-        gsap.from("[data-contact-reveal]", {
+        gsap.from('[data-contact-reveal]', {
           y: 28,
           opacity: 0,
           duration: 0.8,
           stagger: 0.1,
-          ease: "power3.out",
+          ease: 'power3.out',
           scrollTrigger: {
             trigger: containerRef.current,
-            start: "top 88%",
+            start: 'top 88%',
             once: true,
           },
         });
@@ -57,7 +57,7 @@ export function Contact() {
 
       return () => mm.revert();
     },
-    { scope: containerRef },
+    { scope: containerRef }
   );
 
   return (
@@ -79,10 +79,7 @@ export function Contact() {
             </p>
           </div>
 
-          <ul
-            data-contact-reveal
-            className="flex flex-wrap items-center gap-8"
-          >
+          <ul data-contact-reveal className="flex flex-wrap items-center gap-8">
             <li>
               <a
                 href={GITHUB_URL}
@@ -96,17 +93,25 @@ export function Contact() {
             </li>
             <li>
               <span className="text-sm font-medium text-[var(--fg-muted)]">
-                Email:{" "}
-                <span className="text-[var(--fg)] opacity-60">
-                  [email placeholder]
-                </span>
+                Email:{' '}
+                <a
+                  href="mailto:bintangmurtifandy@gmail.com"
+                  className="text-[var(--fg)] opacity-60 hover:underline transition hover:text-white"
+                >
+                  bintangmurtifandy@gmail.com
+                </a>
               </span>
             </li>
             <li>
-              <span className="text-sm font-medium text-[var(--fg-muted)]">
-                LinkedIn:{" "}
-                <span className="text-[var(--fg)] opacity-60">[placeholder]</span>
-              </span>
+              <a
+                href="https://www.linkedin.com/in/bintangmurtifandy/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={LINK_CLASS}
+              >
+                LinkedIn
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
             </li>
           </ul>
         </div>

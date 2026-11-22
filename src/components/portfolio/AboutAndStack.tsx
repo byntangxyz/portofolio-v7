@@ -1,35 +1,28 @@
-"use client";
+'use client';
 
-import { useGSAP } from "@gsap/react";
-import { useRef, type ReactNode } from "react";
+import { useGSAP } from '@gsap/react';
+import Image from 'next/image';
+import { useRef, type ReactNode } from 'react';
 
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { gsap, ScrollTrigger } from '@/lib/gsap';
 
 /**
  * Verified facts only. Anything not confirmed stays a clearly marked
  * placeholder instead of invented biography, clients, or dates.
  */
-const ROLE = "Full-Stack Developer & Network Engineer";
-const FOCUS = "Building web applications and self-hosted infrastructure";
+const ROLE = 'Full-Stack Developer & Network Engineer';
+const FOCUS = 'Building web applications and managing infrastructure';
 
-const GITHUB_URL = "https://github.com/byntangxyz";
+const GITHUB_URL = 'https://github.com/byntangxyz';
 
 const STACK_GROUPS = [
   {
-    label: "Frontend",
-    items: ["Next.js", "TypeScript", "Vue / Nuxt"],
+    label: 'Frontend',
+    items: ['Next.js', 'Vue / Nuxt', 'Tailwind CSS'],
   },
   {
-    label: "Backend & Infrastructure",
-    items: [
-      "Laravel",
-      "Go",
-      "PostgreSQL",
-      "SQLite",
-      "Docker",
-      "Proxmox",
-      "MikroTik",
-    ],
+    label: 'Backend & Infrastructure',
+    items: ['Laravel', 'Go', 'Node.js', 'Docker', 'Proxmox', 'MikroTik'],
   },
 ] as const;
 
@@ -51,43 +44,41 @@ export function AboutAndStack() {
     () => {
       const mm = gsap.matchMedia();
 
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
         // Masked heading reveal: the wrapper clips, the inner span slides up.
         // Each mask owns its trigger so the lower heading still animates when
         // the reader actually reaches it.
-        gsap.utils
-          .toArray<HTMLElement>("[data-about-mask]")
-          .forEach((mask) => {
-            gsap.from(mask.querySelector("[data-about-mask-inner]"), {
-              yPercent: 110,
-              duration: 1,
-              ease: "power4.out",
-              scrollTrigger: {
-                trigger: mask,
-                start: "top 85%",
-                once: true,
-              },
-            });
+        gsap.utils.toArray<HTMLElement>('[data-about-mask]').forEach((mask) => {
+          gsap.from(mask.querySelector('[data-about-mask-inner]'), {
+            yPercent: 110,
+            duration: 1,
+            ease: 'power4.out',
+            scrollTrigger: {
+              trigger: mask,
+              start: 'top 85%',
+              once: true,
+            },
           });
+        });
 
         // Portrait parallax: scrubbed drift keeps the column from feeling
         // static while the copy beside it reveals on a separate trigger.
         gsap.fromTo(
-          "[data-about-portrait]",
+          '[data-about-portrait]',
           { yPercent: -6 },
           {
             yPercent: 6,
-            ease: "none",
+            ease: 'none',
             scrollTrigger: {
-              trigger: "[data-about-portrait]",
-              start: "top bottom",
-              end: "bottom top",
+              trigger: '[data-about-portrait]',
+              start: 'top bottom',
+              end: 'bottom top',
               scrub: 0.8,
             },
-          },
+          }
         );
 
-        const blocks = gsap.utils.toArray<HTMLElement>("[data-about-reveal]");
+        const blocks = gsap.utils.toArray<HTMLElement>('[data-about-reveal]');
 
         if (blocks.length === 0) return;
 
@@ -101,14 +92,14 @@ export function AboutAndStack() {
         gsap.set(blocks, { y: 40, opacity: 0 });
 
         ScrollTrigger.batch(blocks, {
-          start: "top 85%",
+          start: 'top 85%',
           once: true,
           onEnter: (batch) =>
             gsap.to(batch, {
               y: 0,
               opacity: 1,
               duration: 0.85,
-              ease: "power3.out",
+              ease: 'power3.out',
               stagger: 0.1,
               overwrite: true,
             }),
@@ -117,7 +108,7 @@ export function AboutAndStack() {
 
       return () => mm.revert();
     },
-    { scope: containerRef },
+    { scope: containerRef }
   );
 
   return (
@@ -125,13 +116,16 @@ export function AboutAndStack() {
       <div className="text-center" data-about-reveal>
         <h2
           className="font-serif font-normal tracking-[-0.02em] text-[var(--fg)]"
-          style={{ fontSize: "clamp(2.25rem, 4.5vw, 3.75rem)" }}
+          style={{ fontSize: 'clamp(2.25rem, 4.5vw, 3.75rem)' }}
         >
           <span
             data-about-mask
             className="inline-block overflow-hidden pb-[0.12em] align-bottom"
           >
-            <span data-about-mask-inner className="inline-block will-change-transform">
+            <span
+              data-about-mask-inner
+              className="inline-block will-change-transform"
+            >
               About
             </span>
           </span>
@@ -142,22 +136,22 @@ export function AboutAndStack() {
       </div>
 
       <div className="mt-16 grid grid-cols-1 items-start gap-12 md:mt-20 md:grid-cols-[auto_1fr] md:gap-16">
-        <div
-          className="mx-auto w-56 md:mx-0 md:w-72"
-          data-about-reveal
-        >
+        <div className="mx-auto w-56 md:mx-0 md:w-72" data-about-reveal>
           <div
             data-about-portrait
-            role="img"
-            aria-label="Portrait placeholder"
-            className="flex h-56 w-56 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] grayscale will-change-transform md:h-72 md:w-72"
+            className="h-56 w-56 overflow-hidden rounded-full border border-[var(--border)] bg-[var(--surface)] grayscale will-change-transform md:h-72 md:w-72"
           >
-            <span className="font-serif text-3xl tracking-[0.02em] text-[var(--fg-muted)]">
-              BM
-            </span>
+            <Image
+              src="/user-profile.png"
+              alt="Bintang Murtifandy"
+              width={288}
+              height={288}
+              sizes="(min-width: 768px) 18rem, 14rem"
+              className="h-full w-full object-cover"
+            />
           </div>
           <p className="mt-4 text-center text-[11px] uppercase tracking-[0.12em] text-[var(--fg-muted)] md:text-left">
-            Portrait placeholder
+            Bintang Murtifandy
           </p>
         </div>
 
@@ -168,14 +162,18 @@ export function AboutAndStack() {
 
           <div className="mt-5 space-y-5 font-serif text-lg leading-relaxed text-[var(--fg)]">
             <p>
-              I work across the full stack — from interface code in Next.js,
-              TypeScript, and Vue/Nuxt through Laravel and Go services backed by
-              PostgreSQL and SQLite.
+              I am Bintang Maulana Murtifandy, a Fullstack Web Developer with a
+              strong foundation in Network Infrastructure. Currently completing
+              my studies in Informatics and Networking, I enjoy working at the
+              intersection of the software people interact with and the
+              underlying systems that keep it running.
             </p>
             <p>
-              The rest of my time goes into self-hosted infrastructure: Docker
-              containers, Proxmox virtualisation, and MikroTik networking that
-              keep the applications running on hardware I control.
+              I focus on turning complex problems into practical, dependable
+              solutions. Whether collaborating on a team project, managing
+              infrastructure, or building independent work, I am always eager to
+              create useful technology and keep growing across both software and
+              networking.
             </p>
           </div>
 
@@ -194,13 +192,16 @@ export function AboutAndStack() {
       <div className="mt-24 md:mt-32">
         <h3
           className="text-center font-serif font-normal tracking-[-0.02em] text-[var(--fg)]"
-          style={{ fontSize: "clamp(2.25rem, 4.5vw, 3.75rem)" }}
+          style={{ fontSize: 'clamp(2.25rem, 4.5vw, 3.75rem)' }}
         >
           <span
             data-about-mask
             className="inline-block overflow-hidden pb-[0.12em] align-bottom"
           >
-            <span data-about-mask-inner className="inline-block will-change-transform">
+            <span
+              data-about-mask-inner
+              className="inline-block will-change-transform"
+            >
               Experience &amp; Stack
             </span>
           </span>
@@ -212,8 +213,7 @@ export function AboutAndStack() {
               Professional history
             </p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--fg-muted)]">
-              Placeholder — dates, employers, and roles to be supplied. No
-              experience entries are published until they are verified.
+              Freelance Web Developer — 2025–present 
             </p>
           </StackColumn>
 

@@ -16,6 +16,13 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
  *              splits into two half-screen panels and the Hero shows through.
  *              The overlay unmounts the moment the timeline completes.
  *
+ * The exit is also the broadcast point for the rest of the page: as the curtain
+ * starts to part we set `window.__preloaderDone` and emit
+ * `portfolio:preloader-done`, so the Hero's entrance can play in sync with the
+ * reveal instead of finishing underneath the overlay. The flag also lets a
+ * Hero that mounts later (e.g. navigating back to `/`) start immediately
+ * without waiting for an event that will never fire again.
+ *
  * Only `x` / `y` / `scale` / `opacity` are tweened. The one exception is the
  * counter's text value, which is written on GSAP's own tick.
  *
@@ -40,6 +47,23 @@ export function Preloader() {
   const containerRef = useRef<HTMLDivElement>(null);
   const counterRef = useRef<HTMLSpanElement>(null);
   const [active, setActive] = useState(true);
+  const doneRef = useRef(false);
+
+  /**
+   * Tells the rest of the page that the curtain is parting. Consumers (the Hero)
+   * listen for the event; the flag covers Heroes that mount after the signal,
+   * which is the case when navigating back to `/` from another route.
+   *
+   * Idempotent: the ref latches after the first call so the daisy-chained
+   * triggers (timeline call, `onUpdate` net, `onComplete`, cleanup) can never
+   * double-fire the event.
+   */
+  const notifyPreloaderDone = () => {
+    if (doneRef.current) return;
+    doneRef.current = true;
+    (window as Window & { __preloaderDone?: boolean }).__preloaderDone = true;
+    window.dispatchEvent(new Event("portfolio:preloader-done"));
+  };
 
   useGSAP(
     () => {
@@ -50,6 +74,10 @@ export function Preloader() {
 
       const root = document.documentElement;
       const previousOverflow = root.style.overflow;
+
+      // A fresh curtain is closed again: any Hero mounting with the intro still
+      // running must wait for the exit signal rather than play immediately.
+      (window as Window & { __preloaderDone?: boolean }).__preloaderDone = false;
 
       // Scroll is frozen while the curtain is closed.
       root.style.overflow = "hidden";
@@ -64,6 +92,9 @@ export function Preloader() {
 
       if (prefersReducedMotion) {
         restoreScroll();
+        // No curtain animation will run, so the Hero (and anything else
+        // gating on the signal) is free to present itself right away.
+        notifyPreloaderDone();
         setActive(false);
         requestAnimationFrame(() => ScrollTrigger.refresh());
         return;
@@ -79,8 +110,16 @@ export function Preloader() {
 
       const timeline = gsap.timeline({
         defaults: { ease: "power3.out" },
+        onUpdate: () => {
+          // Safety net for an interrupted timeline: if playback ever crosses
+          // into Stage 3 without the scheduled callback running (seek, tab
+          // throttling, a janky first frame), the signal still fires on time.
+          if (timeline.time() >= EXIT_START) notifyPreloaderDone();
+        },
         onComplete: () => {
           restoreScroll();
+          // Guaranteed release even if Stage 3 was skipped entirely.
+          notifyPreloaderDone();
           // Hide the last painted frame before React drops the overlay so not
           // even a stray sub-pixel edge can sit over the Hero.
           gsap.set(overlay, { autoAlpha: 0 });
@@ -171,6 +210,10 @@ export function Preloader() {
         // The panels carry the black canvas from here on, so the wrapper's
         // background must stop covering the Hero as they separate.
         .set(overlay, { backgroundColor: "transparent", pointerEvents: "none" }, EXIT_START)
+        // Release the Hero entrance on the exact frame the curtain begins to
+        // part, so the type emerges from behind the panels rather than
+        // finishing underneath them.
+        .call(notifyPreloaderDone, undefined, EXIT_START)
         .to(
           "[data-pl-panel-top]",
           { yPercent: -100, duration: 0.85, ease: "power4.inOut" },
@@ -182,8 +225,12 @@ export function Preloader() {
           EXIT_START,
         );
 
-      // If the route changes mid-run, never leave the page scroll-locked.
-      return restoreScroll;
+      // If the route changes mid-run, never leave the page scroll-locked, and
+      // never leave the Hero waiting on a curtain that no longer exists.
+      return () => {
+        restoreScroll();
+        notifyPreloaderDone();
+      };
     },
     { scope: containerRef, dependencies: [active] },
   );
