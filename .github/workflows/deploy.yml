@@ -25,6 +25,7 @@ jobs:
       - name: Install dependencies & verify
         run: |
           pnpm install --frozen-lockfile
+          npx next typegen
           npx tsc --noEmit
           npx eslint src --max-warnings=0
 
