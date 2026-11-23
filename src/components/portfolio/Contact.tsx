@@ -92,15 +92,12 @@ export function Contact() {
               </a>
             </li>
             <li>
-              <span className="text-sm font-medium text-[var(--fg-muted)]">
-                Email:{' '}
-                <a
-                  href="mailto:bintangmurtifandy@gmail.com"
-                  className="text-[var(--fg)] opacity-60 hover:underline transition hover:text-white"
-                >
-                  bintangmurtifandy@gmail.com
-                </a>
-              </span>
+              <a
+                href="mailto:bintangmurtifandy@gmail.com"
+                className={LINK_CLASS}
+              >
+                Email <span className="sr-only"> (opens in a new tab)</span>
+              </a>
             </li>
             <li>
               <a
@@ -110,6 +107,17 @@ export function Contact() {
                 className={LINK_CLASS}
               >
                 LinkedIn
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://threads.com/@byntangxyz"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={LINK_CLASS}
+              >
+                Threads
                 <span className="sr-only"> (opens in a new tab)</span>
               </a>
             </li>
